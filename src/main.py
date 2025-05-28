@@ -28,15 +28,27 @@ def get_logger() -> logging.Logger:
     return logging.getLogger(__name__)
 
 
-def configure_logging(log_level: str = "INFO") -> None:
+def configure_logging(output_dir: Path, log_level: str = "INFO", log_to_console: bool = False) -> None:
     """Configure logging for the CLI.
 
     Args:
+        output_dir (Path): Directory where the log file will be written.
         log_level (str): Logging level (e.g., 'INFO', 'DEBUG').
+        log_to_console (bool): If True, also log to the console.
     """
+    output_dir.mkdir(parents=True, exist_ok=True)
+    log_file = output_dir / "app.log"
+    handlers: list[logging.Handler] = [logging.FileHandler(log_file, mode="a", encoding="utf-8")]
+    if log_to_console:
+        handlers.append(logging.StreamHandler())
+    root_logger = logging.getLogger()
+    # Remove all handlers associated with the root logger object (avoid duplicate logs if reconfigured)
+    for handler in root_logger.handlers[:]:
+        root_logger.removeHandler(handler)
     logging.basicConfig(
         level=getattr(logging, log_level.upper(), logging.INFO),
         format="%(asctime)s %(levelname)s %(message)s",
+        handlers=handlers,
     )
 
 
@@ -47,7 +59,7 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
         args (list[str] | None): List of CLI arguments or None for sys.argv.
 
     Returns:
-        argparse.Namespace: Parsed arguments with input_dir, output_dir, and log_level.
+        argparse.Namespace: Parsed arguments with input_dir, output_dir, log_level, and log_to_console.
     """
     parser = argparse.ArgumentParser(
         description="Convert PDF pages to PNG images.",
@@ -71,6 +83,11 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         help="Set the logging level.",
+    )
+    parser.add_argument(
+        "--log-to-console",
+        action="store_true",
+        help="Enable logging to console in addition to file.",
     )
     return parser.parse_args(args)
 
@@ -122,7 +139,7 @@ def main(args: list[str] | None = None) -> int:
         int: Exit code (0 for success, 1 for error, 0 for no PDFs found).
     """
     parsed = parse_args(args)
-    configure_logging(parsed.log_level)
+    configure_logging(parsed.output_dir, parsed.log_level, parsed.log_to_console)
     logger = get_logger()
     input_dir: Path = parsed.input_dir
     output_dir: Path = parsed.output_dir
