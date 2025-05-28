@@ -89,6 +89,11 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Enable logging to console in addition to file.",
     )
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Overwrite existing PNG files.",
+    )
     return parser.parse_args(args)
 
 
@@ -164,7 +169,7 @@ def main(args: list[str] | None = None) -> int:
     exit_code = 0
     for pdf_file in pdf_files:
         try:
-            pdf_to_pngs(pdf_file, output_dir)
+            pdf_to_pngs(pdf_file, output_dir, overwrite=parsed.overwrite)
         except PdfConversionError as e:
             logger.error(e)
             exit_code = 1

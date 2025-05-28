@@ -7,6 +7,7 @@ A robust, test-driven CLI tool to batch-convert PDF files to PNG images, designe
 - Outputs images to a specified directory, preserving original filenames
 - Clear logging and error handling
 - 90%+ test coverage enforced via CI
+- Option to overwrite existing PNG files
 
 ## Requirements
 - Python 3.11 (recommended: use a virtual environment)
@@ -31,11 +32,30 @@ pip install -r requirements.txt
 ## Usage
 Convert all PDFs in the `data/` directory to PNGs in the `output/` directory:
 ```sh
-python src/main.py --input-dir ./data --output-dir ./output
+python src/main.py --input-dir ./data --output-dir ./output [options]
 ```
 Arguments:
 - `--input-dir`: Directory containing PDF files (default: `./data`)
 - `--output-dir`: Directory to save PNG images (default: `./output`)
+- `--log-level`: Set logging level (`DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`; default: `INFO`)
+- `--log-to-console`: Enable logging to console in addition to file
+- `--overwrite`: Overwrite existing PNG files
+
+### Example
+```sh
+python src/main.py --input-dir ./pdfs --output-dir ./images --log-level DEBUG --log-to-console --overwrite
+```
+
+## Logging
+
+- All logs are written to `app.log` in the output directory specified by `--output-dir`.
+- You can control the verbosity of logs using the `--log-level` option.
+- To also see logs in your terminal, use the `--log-to-console` flag.
+- Example:  
+  ```bash
+  python src/main.py --log-level DEBUG --log-to-console
+  ```
+- Log rotation is not enabled by default; the log file is appended to on each run.
 
 ## Project Structure
 ```
