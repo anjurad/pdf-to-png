@@ -1,0 +1,30 @@
+[project]
+name = "wm5g"
+version = "0.1.0"
+description = "PDF to PNG batch converter CLI"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[project.dependencies]
+pdf2image = "^1.17.0"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "--cov=src --cov-fail-under=90"
+testpaths = [
+    "tests",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "pytest",
+]
